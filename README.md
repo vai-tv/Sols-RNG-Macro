@@ -2,7 +2,7 @@
 rng the sols uhhh macro (might not be very accessible) :boom:
 
 ```bash
-git clone [https://github.com/vai-tv/Sols-RNG-Macro.git](https://github.com/vai-tv/Sols-RNG-Macro.git)
+git clone https://github.com/vai-tv/Sols-RNG-Macro.git
 cd Sols-RNG-Macro
 
 pip install -r requirements.txt
