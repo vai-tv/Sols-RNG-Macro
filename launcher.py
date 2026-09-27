@@ -10,12 +10,24 @@ from utils.constants import Git
 from utils.logger import setup_logger
 
 def get_latest_release() -> tuple[str, list[dict]]:
+    """Attempt to fetch the latest release information from GitHub, with a fallback to prerelease."""
     try:
         response = requests.get(Git.URL, timeout=5)
         if response.status_code == 200:
             latest_release = response.json()
             return latest_release['tag_name'], latest_release['assets']
         elif response.status_code == 404:
+            logging.warning("No stable releases found. Checking for prereleases...")
+            releases_url = Git.URL.rsplit("/", 1)[0]
+            prerelease_response = requests.get(releases_url, timeout=5)
+            if prerelease_response.status_code == 200:
+                prereleases = [
+                    release for release in prerelease_response.json()
+                    if release.get("prerelease")
+                ]
+                if prereleases:
+                    prerelease = prereleases[0]
+                    return prerelease['tag_name'], prerelease['assets']
             logging.warning("No releases found on GitHub yet. Skipping update check.")
         else:
             logging.error(f"Failed to fetch the latest release. Status code: {response.status_code}")
