@@ -1,1 +1,3 @@
-raise NotImplementedError("This function is not implemented yet.")
+import logging
+
+logging.warning("Main does not exist yet!")
