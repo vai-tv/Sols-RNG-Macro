@@ -1,3 +1,9 @@
-import logging
+from roblox.handlers.ClientHandler import ClientHandler
 
-logging.warning("Main does not exist yet!")
+def main():
+    client = ClientHandler()
+
+    client.sustain()
+
+
+main()
