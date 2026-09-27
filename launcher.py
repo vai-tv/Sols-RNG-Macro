@@ -47,13 +47,19 @@ def main():
         logging.info("Could not retrieve the latest release information. Launching current version...")
         launch_main()
         return
-    logging.info(f"Latest release: {latest_version} | Current version: {Git.VERSION}")
+    logging.info(f"Latest Github release: {latest_version} | Running version: {Git.VERSION}")
 
     # compare versions and decide whether to update or launch the current version
     if latest_version == Git.VERSION:
         logging.info("You are already on the latest version.")
         launch_main()
         return
+
+    elif latest_version < Git.VERSION:
+        logging.warning(f"You are running a newer version ({Git.VERSION}) than the latest release ({latest_version}). Did you build from source? Launching current version...")
+        launch_main()
+        return
+    
     logging.info(f"New version available ({latest_version})! Preparing update...")
     target_asset_name = "main.exe" if sys.platform == "win32" else "main_mac"
 
