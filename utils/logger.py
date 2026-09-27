@@ -10,4 +10,3 @@ def setup_logger():
             logging.StreamHandler()
         ]
     )
-    logging.info("Logger initialized.")
