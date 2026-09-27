@@ -1,5 +1,5 @@
 class Git:
     AUTHOR = "vai-tv"
     REPO = "Sols-RNG-Macro"
-    VERSION = "v0.0.3"
+    VERSION = "v0.0.4"
     URL = f"https://api.github.com/repos/{AUTHOR}/{REPO}/releases/latest"
