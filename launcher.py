@@ -6,7 +6,8 @@ import sys
 import urllib.request
 import requests
 
-from constants import Git
+from utils.constants import Git
+from utils.logger import setup_logger
 
 GITHUB_REPO_URL = f"https://api.github.com/repos/{Git.AUTHOR}/{Git.REPO}/releases/latest"
 
@@ -30,11 +31,15 @@ def launch_main():
     try:
         logging.info("Launching main.py...")
         # Use Popen or run depending on whether you want the launcher to stay open or close
-        subprocess.run([sys.executable, "macro/main.py"], check=True)
+        subprocess.run([sys.executable, "macro/src/main.py"], check=True)
     except subprocess.CalledProcessError as e:
         logging.error(f"Failed to launch main.py: {e}")
 
 def main():
+
+    # setup logging
+    setup_logger()
+
     logging.info("Checking for the latest release...")
     latest_version, assets = get_latest_release()
 
