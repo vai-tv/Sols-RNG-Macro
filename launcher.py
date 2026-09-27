@@ -18,11 +18,11 @@ def get_latest_release() -> tuple[str, list[dict]]:
             latest_release = response.json()
             return latest_release['tag_name'], latest_release['assets']
         elif response.status_code == 404:
-            print("No releases found on GitHub yet. Skipping update check.")
+            logging.warning("No releases found on GitHub yet. Skipping update check.")
         else:
-            print(f"Failed to fetch the latest release. Status code: {response.status_code}")
+            logging.error(f"Failed to fetch the latest release. Status code: {response.status_code}")
     except Exception as e:
-        print(f"An error occurred while fetching the latest release: {e}")
+        logging.error(f"An error occurred while fetching the latest release: {e}")
     
     return None, []
 
