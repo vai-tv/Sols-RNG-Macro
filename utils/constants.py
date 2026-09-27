@@ -1,4 +1,4 @@
 class Git:
     AUTHOR = "vai-tv"
     REPO = "Sols-RNG-Macro"
-    VERSION = "v0.0.0"
+    VERSION = "v0.0.1"
