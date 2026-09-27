@@ -9,11 +9,9 @@ import requests
 from utils.constants import Git
 from utils.logger import setup_logger
 
-GITHUB_REPO_URL = f"https://api.github.com/repos/{Git.AUTHOR}/{Git.REPO}/releases/latest"
-
 def get_latest_release() -> tuple[str, list[dict]]:
     try:
-        response = requests.get(GITHUB_REPO_URL)
+        response = requests.get(Git.URL, timeout=5)
         if response.status_code == 200:
             latest_release = response.json()
             return latest_release['tag_name'], latest_release['assets']
@@ -29,6 +27,7 @@ def get_latest_release() -> tuple[str, list[dict]]:
 def launch_main():
     """Launch the main.py script using subprocess."""
     try:
+        print()
         logging.info("Launching main.py...")
         # Use Popen or run depending on whether you want the launcher to stay open or close
         subprocess.run([sys.executable, "macro/src/main.py"], check=True)
@@ -40,7 +39,8 @@ def main():
     # setup logging
     setup_logger()
 
-    logging.info("Checking for the latest release...")
+    # check for updates
+    logging.info(f"Checking for the latest release from {Git.URL}...")
     latest_version, assets = get_latest_release()
 
     if not latest_version:
@@ -49,13 +49,14 @@ def main():
         return
     logging.info(f"Latest release: {latest_version} | Current version: {Git.VERSION}")
 
+    # compare versions and decide whether to update or launch the current version
     if latest_version == Git.VERSION:
         logging.info("You are already on the latest version.")
         launch_main()
         return
     logging.info(f"New version available ({latest_version})! Preparing update...")
-
     target_asset_name = "main.exe" if sys.platform == "win32" else "main_mac"
+
     # find the download URL for the appropriate asset based on the platform
     download_url = [asset['browser_download_url'] for asset in assets if asset['name'] == target_asset_name][0]
 
