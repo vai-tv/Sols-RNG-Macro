@@ -1,0 +1,83 @@
+import json
+import logging
+import os
+import subprocess
+import sys
+import urllib.request
+import requests
+
+from constants import Git
+
+GITHUB_REPO_URL = f"https://api.github.com/repos/{Git.AUTHOR}/{Git.REPO}/releases/latest"
+
+def get_latest_release() -> tuple[str, list[dict]]:
+    try:
+        response = requests.get(GITHUB_REPO_URL)
+        if response.status_code == 200:
+            latest_release = response.json()
+            return latest_release['tag_name'], latest_release['assets']
+        elif response.status_code == 404:
+            print("No releases found on GitHub yet. Skipping update check.")
+        else:
+            print(f"Failed to fetch the latest release. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred while fetching the latest release: {e}")
+    
+    return None, []
+
+def launch_main():
+    """Launch the main.py script using subprocess."""
+    try:
+        logging.info("Launching main.py...")
+        # Use Popen or run depending on whether you want the launcher to stay open or close
+        subprocess.run([sys.executable, "macro/main.py"], check=True)
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Failed to launch main.py: {e}")
+
+def main():
+    logging.info("Checking for the latest release...")
+    latest_version, assets = get_latest_release()
+
+    if not latest_version:
+        logging.info("Could not retrieve the latest release information. Launching current version...")
+        launch_main()
+        return
+    logging.info(f"Latest release: {latest_version} | Current version: {Git.VERSION}")
+
+    if latest_version == Git.VERSION:
+        logging.info("You are already on the latest version.")
+        launch_main()
+        return
+    logging.info(f"New version available ({latest_version})! Preparing update...")
+
+    target_asset_name = "main.exe" if sys.platform == "win32" else "main_mac"
+    # find the download URL for the appropriate asset based on the platform
+    download_url = [asset['browser_download_url'] for asset in assets if asset['name'] == target_asset_name][0]
+
+    if not download_url:
+        logging.warning(f"No matching asset found for your platform ({target_asset_name}). Launching current version...")
+        launch_main()
+        return
+
+    temp_path = os.path.join(os.path.expanduser("~"), target_asset_name)
+    logging.info(f"Downloading update from {download_url}...")
+    
+    try:
+        urllib.request.urlretrieve(download_url, temp_path)
+
+        # send to updater_helper.py to handle the file swap and restart
+        subprocess.Popen([
+            sys.executable,
+            "updater_helper.py",
+            os.path.abspath("main.py"),
+            temp_path
+        ])
+        sys.exit()
+
+    except Exception as e:
+        logging.error(f"Download failed: {e}. Launching current version...")
+
+    launch_main()
+
+if __name__ == "__main__":
+    main()
