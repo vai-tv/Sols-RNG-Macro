@@ -12,16 +12,20 @@ important_config = [
     ("discord", "BOT_TOKEN"),
 ]
 
-class Config:
+class ConfigManager:
+
+    data = {}
 
     def __init__(self):
-        self.data = self.load()
+        self.data = ConfigManager.data if ConfigManager.data else ConfigManager.load()
+        ConfigManager.data = self.data
 
     def __getitem__(self, key):
         return self.data[key]
 
     # sorry for poo typing
-    def load(self) -> dict[str, str | dict]:
+    @staticmethod
+    def load() -> dict[str, str | dict]:
         """
         Loads config file with JSON at startup. Also checks for key constants and raises necessary errors.
         Returns JSON dict.
@@ -30,18 +34,18 @@ class Config:
         with open(CONFIG_PATH, "r", encoding="utf-8") as f:
             config = json.load(f)
 
+        config_walker = config.copy()
+
         # check for important config presence
         for location in important_config:
             for directory in location:
                 try:
-                    config = config[directory]
+                    config_walker = config_walker[directory]
                 except KeyError:
                     raise KeyError(f"Tried to look for a missing important config variable '{directory}' in {config}.")
 
                 # raise logging error if the important config couldn't be found
-                if not config:
+                if not config_walker:
                     logging.error(message('errors', 'missing_config', variable_name=directory))
 
         return config
-
-CONFIG = Config()
