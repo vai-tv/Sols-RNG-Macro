@@ -1,6 +1,8 @@
 # Sols-RNG-Macro
 rng the sols uhhh macro (might not be very accessible) :boom:
 
+## instlaltion
+
 for macos
 ```bash
 git clone https://github.com/vai-tv/Sols-RNG-Macro.git
@@ -20,3 +22,11 @@ pip install -r requirements.txt
 
 python launcher.py
 ```
+
+## developer notes (if you want to make custom overlays / commands)
+
+there are folders in `macro/src/roblox` and `macro/src/discord` titled respectively. 
+
+i suggest you familiarise yourself with the example overlays / commands first if you don't know what you're doing
+
+in fact there are docnotes for a lot of the files, do yourself a favour and get to know everything because i tried to made it easier for you :D
