@@ -1,2 +1,6 @@
-{   
+{
+    "discord" : {
+        "BOT_TOKEN" : ""
+    },
+    "antiAFKinterval" : 60
 }
