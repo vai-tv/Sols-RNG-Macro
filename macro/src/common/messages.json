@@ -1,0 +1,5 @@
+{
+    "errors" : {
+        "missing_config" : "!! You are missing an IMPORTANT configuration variable {}! Please check config.json and make sure you have it set."
+    }
+}
