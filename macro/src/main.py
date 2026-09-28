@@ -12,9 +12,13 @@ from utils.logger import logging
 
 def main():
     from roblox.handlers.ClientHandler import ClientHandler
-    client = ClientHandler()
+    from discord.handlers.DiscordHandler import DiscordHandler
 
+    client = ClientHandler()
     client.sustain()
+
+    discord = DiscordHandler()
+    discord.sustain()
 
 if __name__ == '__main__':
     main()

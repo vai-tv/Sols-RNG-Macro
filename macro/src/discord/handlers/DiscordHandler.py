@@ -6,11 +6,25 @@
 * it is needed constantly to manage server commands and discord chat
 """
 
-class DiscordHandler:
-    def __init__(self, bot):
-        self.bot = bot
+import discord as disc
+import time
 
-    async def send_message(self, channel_id, message):
-        channel = self.bot.get_channel(channel_id)
-        if channel:
-            await channel.send(message)
+from launcher import CONFIG, logging
+
+TOKEN = CONFIG["discord", "BOT_TOKEN"]
+print(TOKEN)
+
+class DiscordHandler:
+    def __init__(self):
+        pass
+
+    def start(self):
+
+        logging.info("Starting Discord...")
+
+    def sustain(self):
+
+        while True:
+
+            time.sleep(0.5)
+            pass
