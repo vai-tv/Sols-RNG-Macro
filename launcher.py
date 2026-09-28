@@ -20,6 +20,9 @@ from utils.logger import setup_logger
 
 from macro.src.common.config import ConfigManager
 
+setup_logger()
+CONFIG = ConfigManager().load()
+
 def get_latest_release() -> tuple[str, str] | None:
     """
     Attempt to fetch the latest release information from GitHub, with a fallback to prerelease.
@@ -105,11 +108,8 @@ def launch_main():
         logging.fatal("[WARNING] An unknown error occured with the main file!")
         logging.fatal(f"Failed to launch main.py: {e}")
 
-def start():
 
-    # setup
-    setup_logger()
-    CONFIG = ConfigManager.load()
+def start():
 
     # check for updates
     print()

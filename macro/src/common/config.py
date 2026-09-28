@@ -1,6 +1,7 @@
 import json
 import logging
 import pathlib
+from typing import Any
 
 from os import path
 
@@ -14,18 +15,21 @@ important_config = [
 
 class ConfigManager:
 
-    data = {}
+    data: dict[str, Any] = {}
 
     def __init__(self):
         self.data = ConfigManager.data if ConfigManager.data else ConfigManager.load()
         ConfigManager.data = self.data
 
-    def __getitem__(self, key):
-        return self.data[key]
+    def __getitem__(self, key: tuple[str, ...]) -> Any:
+        value = self.data
+        for directory in key:
+            value = value[directory]
+        return value
 
     # sorry for poo typing
     @staticmethod
-    def load() -> dict[str, str | dict]:
+    def load() -> dict[str, Any]:
         """
         Loads config file with JSON at startup. Also checks for key constants and raises necessary errors.
         Returns JSON dict.
