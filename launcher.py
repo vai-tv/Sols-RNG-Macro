@@ -1,3 +1,12 @@
+"""
+# LAUNCHER
+
+* this module launches the game when run.
+* it checks for updates from the GitHub repository and applies them if available.
+* this is the start of the workflow and the first module to be run when the program is executed.
+
+"""
+
 import logging
 import io
 import os
