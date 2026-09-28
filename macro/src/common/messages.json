@@ -1,5 +1,8 @@
 {
     "errors" : {
-        "missing_config" : "!! You are missing an IMPORTANT configuration variable {}! Please check config.json and make sure you have it set."
+        "missing_config" : "!! You are missing an IMPORTANT configuration variable {}! Please check config.json and make sure you have it set.",
+        "roblox" : {
+            "no_roblox_window" : "Couldn't find Roblox window. Is it open / active?"
+        }
     }
 }

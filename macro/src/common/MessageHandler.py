@@ -1,3 +1,11 @@
+"""
+# MESSAGE HANDLER
+
+* handle messages.json
+* contains message() function which takes a `*message_location` and  `**variables`
+* used mainly in logging
+"""
+
 import json
 import os
 import pathlib
