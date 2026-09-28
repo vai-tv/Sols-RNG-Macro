@@ -9,9 +9,12 @@ def setup_logger():
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
+        format="%(asctime)s [%(levelname)s %(filename)s] %(message)s",
         handlers=[
             logging.FileHandler(".logs/launcher.log"),
             logging.StreamHandler()
-        ]
+        ],
+        force=True
     )
+
+setup_logger()
