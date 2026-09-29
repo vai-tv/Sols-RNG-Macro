@@ -9,10 +9,9 @@
 import discord as disc
 import time
 
-from launcher import CONFIG, logging
+from launcher import Config, logging
 
-TOKEN = CONFIG["discord", "BOT_TOKEN"]
-print(TOKEN)
+TOKEN = Config("discord", "BOT_TOKEN")
 
 class DiscordHandler:
     def __init__(self):

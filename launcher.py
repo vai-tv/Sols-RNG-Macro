@@ -18,10 +18,9 @@ import zipfile
 from utils.constants import Git
 from utils.logger import setup_logger
 
-from macro.src.common.config import ConfigManager
+from macro.src.common.config import Config
 
 setup_logger()
-CONFIG = ConfigManager().load()
 
 def get_latest_release() -> tuple[str, str] | None:
     """
