@@ -31,7 +31,7 @@ def get_latest_release() -> tuple[str, str] | None:
     """
     headers = {"User-Agent": "Sols-RNG-Macro"}
     try:
-        response = requests.get(Git.URL, headers=headers, timeout=5)
+        response = requests.get(Git.URL, headers=headers, timeout=10)
         # logic gate for 200 and other status codes
         if response.status_code == 200:
             latest_release = response.json()
@@ -39,7 +39,7 @@ def get_latest_release() -> tuple[str, str] | None:
         
         logging.warning("Failed to find a stable release. Checking for prereleases...")
         releases_url = Git.URL.rsplit("/", 1)[0]
-        prerelease_response = requests.get(releases_url, headers=headers, timeout=5)
+        prerelease_response = requests.get(releases_url, headers=headers, timeout=10)
         if prerelease_response.status_code == 200:
             prereleases = [
                 release for release in prerelease_response.json()
