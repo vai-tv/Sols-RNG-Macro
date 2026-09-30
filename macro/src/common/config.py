@@ -9,8 +9,12 @@ from macro.src.common.MessageHandler import message
 
 CONFIG_PATH = path.join(pathlib.Path.cwd(), "config.json")
 
+# list is path to config, final is default value to flag
 important_config = [
-    ("discord", "BOT_TOKEN"),
+    (["discord", "BOT_TOKEN"], 
+     ""),
+    (["roblox", ".ROBLOSECURITY_cookie"], 
+     "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_XXXX1234")
 ]
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     config_file = json.load(f).copy()
@@ -52,18 +56,20 @@ class Config:
         """
         Loads config file at startup. Also checks for key constants and raises necessary errors.
         """
-        config_walker = config_file.copy()
 
         # check for important config presence
         for location in important_config:
-            for directory in location:
+            config_walker = config_file
+
+            for directory in location[0]:
                 try:
                     config_walker = config_walker[directory]
-                except KeyError:
+                except (KeyError, TypeError):
                     raise KeyError(f"Tried to look for a missing important config variable '{directory}' in {config_file}.")
 
                 # raise logging error if the important config couldn't be found
-                if not config_walker:
+                # or if it's equivalent to the default in config example
+                if not config_walker or config_walker == location[1]:
                     logging.error(message('errors', 'missing_config', variable_name=directory))
 
         return config_file

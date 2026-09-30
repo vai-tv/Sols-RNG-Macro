@@ -23,6 +23,15 @@ pip install -r requirements.txt
 python launcher.py
 ```
 
+## common errors
+```
+[ERROR config.py] !! You are missing an IMPORTANT configuration variable .ROBLOSECURITY_cookie! Please check config.json and make sure you have it set.
+```
+* look up how to get your roblosecurity cookie it's straightforward
+* it's sensitive data so be careful!
+
+
+
 ## developer notes (if you want to make custom overlays / commands)
 
 there are folders in `macro/src/roblox` and `macro/src/discord` titled respectively. 
