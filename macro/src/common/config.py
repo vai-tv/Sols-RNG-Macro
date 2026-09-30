@@ -24,11 +24,16 @@ with open(CONFIG_PATH, "r", encoding="utf-8") as f:
 # Retrieved 2026-09-29, License - CC BY-SA 4.0
 JSON: TypeAlias = dict[str, "JSON"] | list["JSON"] | str | int | float | bool | None
 
+DATA: JSON = {}
 
 class Config:
 
     def __init__(self, *home_key: str):
-        self.data: JSON = self.load()
+        global DATA
+        self.data = DATA
+        DATA = self.load()
+
+        self.data = DATA
 
         for directory in home_key:
             self.data = self.data[directory]  # type: ignore[index]
@@ -51,11 +56,13 @@ class Config:
                 exit(1)
         return data
 
-    @staticmethod
-    def load() -> JSON:
+    def load(self) -> JSON:
         """
         Loads config file at startup. Also checks for key constants and raises necessary errors.
         """
+
+        if DATA: # exit if data is already loaded
+            return
 
         # check for important config presence
         for location in important_config:
