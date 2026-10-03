@@ -1,5 +1,7 @@
 requests
 urllib3
+numpy
+mss
 pillow
 pygetwindow
 pynput
