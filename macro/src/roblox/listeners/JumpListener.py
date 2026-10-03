@@ -1,6 +1,6 @@
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
-from ..ListenerManager import Listener
+from ..handlers.ListenerHandler import Listener
 
 __all__ = ["JumpListener"]
 
