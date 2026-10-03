@@ -1,82 +1,52 @@
+"""
+# CLIENT HANDLER
+
+* oh yes here it comes
+* manages the client, starts it, keeps it running, and handles the main loop
+* contains `ClientHandler` which is the main class for the client
+    * also has a `RobloxWindowHandler` class which is used to find and launch the Roblox client
+* also inherits pretty much all handlers... may need to generalise that soon
+"""
+
 import os # used to force open client
-from PIL import Image, ImageGrab
 import pygetwindow as gw  # type: ignore[import-untyped]
 import requests
 import time
 import urllib.parse
 import webbrowser
 
-import main
-from common.MessageHandler import message
-
-from typing import Literal
+from typing import Literal, Protocol, TypedDict
 
 from common.config import Config
 from utils.logger import logging
+
 from roblox.handlers.ListenerHandler import ListenerHandler as ListenerHdlr
 from roblox.handlers.OverlayHandler import OverlayHandler as OverlayHdlr
-# # #
-# umm if it aint broke dont fix it ... ik its DRY in main.py but i have bigger issues rn
+from roblox.handlers.ScreenHandler import ScreenHandler as ScreenHdlr, _get_roblox_window
 
-from common.config import Config
 
-TICK = 50 #ms
+TICK = 500 #ms
 timeout_attempts = 3 # try to start 3 times before giving up
 timeout_base_wait = 4 # seconds, increase by 2x each timeout
 
-class ClientHandler:
+class RobloxWindowHandler:
+    """Find, launch, and connect to the Roblox client."""
 
-    
-    STATUS: Literal["on", "off"] = "off"
 
-    def __init__(self):
-        self.listener_handler = ListenerHdlr()
-        self.overlay_handler = OverlayHdlr()
-
-        self.boot_or_exit()
-
-    def _get_roblox_window(self) -> gw.Window | None:
+    @staticmethod
+    def get_roblox_window() -> gw.Window | None:
         """
-        Helper to get the Roblox window.
-        
-        Also attempts to start Roblox if it is not running.
+        Get and maximise the Roblox window if it exists, otherwise return None.
         """
-        try:
-            roblox_windows: list[gw.Window] = [w for w in gw.getAllWindows() if any(keyword in w.title.lower() for keyword in ['roblox', '.roblox'])] # type: ignore
-            visible_windows: list[gw.Window] = [w for w in roblox_windows if w.visible]
-            
-            window = visible_windows[0] if visible_windows else None
 
-        except Exception as e:
-            logging.error(f"Error checking for Roblox window: {e}")
-            return None
-
+        window = _get_roblox_window()
         if window is None:
-            logging.error(message('errors', 'roblox', 'no_roblox_window'))
             return None
 
-        # attempt to maximise window and possibly join sols
         if not window.isMaximized:
             window.maximize()
             window.activate()
-
         return window
-
-    def _get_screenshot(self, window: gw.Window) -> Image.Image | None:
-        """Capture the screen area occupied by the Roblox window."""
-        try:
-            left = int(window.left)
-            top = int(window.top)
-            right = left + int(window.width)
-            bottom = top + int(window.height)
-
-            if right <= left or bottom <= top:
-                return None
-
-            return ImageGrab.grab(bbox=(left, top, right, bottom))
-        except Exception as error:
-            logging.error(f"Unable to capture Roblox window: {error}")
-            return None
 
     PLACE_ID = 15532962292
     ROBLOSECURITY_COOKIE = Config("roblox", ".ROBLOSECURITY_cookie")
@@ -103,12 +73,12 @@ class ClientHandler:
             logging.error(f"Failed to fetch private servers: {response.status_code}")
         return None
 
-    def _attempt_web_connect(self) -> bool:
+    def attempt_web_connect(self) -> bool:
         """
-        Helper to try connect to Sols RNG through the web.
+        Tries to connect to Sols RNG through the web.
 
         Returns:
-        bool: success status, go figure
+            bool: success status, go figure
         """
 
         base_url = "roblox://experiences/start"
@@ -122,63 +92,109 @@ class ClientHandler:
         query = urllib.parse.urlencode(params)
         URL = f"{base_url}?{query}"
 
-        logging.info("Trying to connect to Sols RNG... please be patient.")
+        logging.info("Trying to connect to Sols RNG through your browser... please be patient.")
 
         return webbrowser.open(URL)
 
+    STATUS: Literal["on", "off"] = "off"
+    
     def start(self) -> bool:
-        """Start the client handler.
+        """
+        Starts the Roblox player and attempts to join the configured Sols RNG server.
         
         Returns:
-        bool: success status
+            bool: success status, go figure
         """
 
-        # obviously don't start client if it's already on
-        if ClientHandler.STATUS == "on":
-            logging.warning("Didn't start client, status says it's on!")
-            return False
-
-        # found roblox window, try to join Sols
-        if self._get_roblox_window() is not None:
+        # get the roblox window if it exists
+        if self.get_roblox_window() is not None:
             logging.info("Found Roblox!")
 
-            if self._attempt_web_connect(): # try to join Sols
-                self.listener_handler.start()
+            # try to connect to Sols RNG through the web
+            # if it fails, warn the user and return False
+            if self.attempt_web_connect():
                 return True
+            logging.warning("Failed to connect to Sols RNG through your browser. Please check your .ROBLOSECURITY cookie and try again.")
+            return False
 
-        # nevermind, try to force client to open through os
-        # find roblox path by walking
-        roblox_path = None
+        # since the roblox window doesn't exist, try to open it
+        logging.info("Roblox is not running. Attempting to start Roblox... you may have to restart the script.")
         for root, _, files in os.walk("C:\\Users"):
+            # if the roblox player is not in this directory, continue searching
             if not any("roblox player" in name.lower() for name in files):
                 continue
 
+            # start roblox through os
             roblox_path = os.path.join(root, "roblox player")
             os.startfile(roblox_path)
 
-            # try to restart after a moment
+            # timeout, then attempt a recursive start
             time.sleep(10)
-            if self.start():
-                return True
+            return self.start()
 
-        logging.warning("Roblox is not running. Please start Roblox.")
         return False
 
-    def boot_or_exit(self):
+    def run_boot_wrapper(self):
         """
+        Wrapper to start the window.
         Either successfully boots Sols RNG or exits.
+
+        Also sets the STATUS to "on" if successful.
         """
+
+        if self.STATUS == "on":
+            logging.warning("Client is already running.")
+            return
 
         for i in range(timeout_attempts):
             if self.start():
                 self.STATUS = "on"
-                return True
+                logging.info("Successfully started window!")
+                return
             logging.warning(f"Failed to start! Trying again ({i + 1}/{timeout_attempts})...")
             # x2 timeout each time
             time.sleep(timeout_base_wait * (2 ** i))
 
         logging.fatal(f"Failed to start client after {timeout_attempts} attempts. Exiting...")
         exit(1)
+
+
+class _Handlers(TypedDict):
+    listener: ListenerHdlr
+    overlay: OverlayHdlr
+    screen: ScreenHdlr
+
+# since in ClientHandler.stopallhandlers() we want to stop all handlers, we can define a protocol for them to implement a stop() method
+class _Handler(Protocol):
+    def stop(self) -> None: ...
+
+class ClientHandler:
+
+    def __init__(self):
+        self.window_handler = RobloxWindowHandler()
+        self.window_handler.run_boot_wrapper()
+
+        # i kindly request that all listeners start on init! teehee
+        self.handlers: _Handlers = {
+            "listener": ListenerHdlr(),
+            "overlay": OverlayHdlr(),
+            "screen": ScreenHdlr()
+        }
+
+    def stopallhandlers(self) -> None:
+        """
+        Stop all handlers.
+        """
+
+        # sorry i hate this type annotation!!
+        handlers: tuple[_Handler, ...] = (
+            self.handlers["listener"],
+            self.handlers["overlay"],
+            self.handlers["screen"],
+        )
+        for handler in handlers:
+            handler.stop()
+        logging.info(f"Stopped all {len(handlers)} handlers.")
 
     def sustain(self):
         """
@@ -188,33 +204,30 @@ class ClientHandler:
         """
         
         try:
-            while (window := self._get_roblox_window()) is not None:
+            while (window := self.window_handler.get_roblox_window()) is not None:
                 time.sleep(TICK * 0.001)
                 print('.', end='', flush=True)
 
-                try:
-                    position = (int(window.left), int(window.top))
-                except gw.PyGetWindowException:
-                    continue
-
-                self.overlay_handler.update(position)
-
                 ##   MAIN CLIENT LOOP   ##
 
-                screenshot = self._get_screenshot(window)
-
-                # ScreenReaders managed by a ScreenManager can then access segments of the screenshot
-                # through ScreenManager().process(screenshot)
-                # which contains the internal loop for ScreenReaders and text processing
+                # handlers go!
+                # self.listener is already listening!
+                position = (int(window.left), int(window.top))
+                self.handlers["overlay"].update(position)
+                self.handlers["screen"].capture_tick()
 
                 ## MAIN CLIENT LOOP END ##
 
             print()
             logging.info("Roblox has been closed. Exiting script.")
+
+        ## EXIT PROCEDURE ##
         
         except KeyboardInterrupt:
             print()
             logging.info("Script interrupted by user. Exiting...")
+        except Exception as e:
+            print()
+            logging.fatal(f"Umm! An unexpected error occurred: {e}")
         finally:
-            self.listener_handler.stop()
-            self.overlay_handler.stop()
+            self.stopallhandlers()
