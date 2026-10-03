@@ -11,7 +11,7 @@ from common.MessageHandler import message
 
 from typing import Literal
 
-# install necessary modules from root
+from common.config import Config
 from utils.logger import logging
 from roblox.handlers.ListenerHandler import ListenerHandler as ListenerHdlr
 from roblox.handlers.OverlayHandler import OverlayHandler as OverlayHdlr

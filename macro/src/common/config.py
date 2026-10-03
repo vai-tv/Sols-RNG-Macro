@@ -8,16 +8,17 @@ from os import path
 from macro.src.common.MessageHandler import message
 
 CONFIG_PATH = path.join(pathlib.Path.cwd(), "config.json")
+CONFIG_EXAMPLE_PATH = path.join(pathlib.Path.cwd(), "config example.json")
 
 # list is path to config, final is default value to flag
-important_config = [
-    (["discord", "BOT_TOKEN"], 
-     ""),
-    (["roblox", ".ROBLOSECURITY_cookie"], 
-     "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_XXXX1234")
+important_config: list[list[str]] = [
+    ["discord", "BOT_TOKEN"],
+    ["roblox", ".ROBLOSECURITY_cookie"]
 ]
 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
     config_file = json.load(f).copy()
+with open(CONFIG_EXAMPLE_PATH, "r", encoding="utf-8") as f:
+    config_example_file = json.load(f).copy()
 
 # Source - https://stackoverflow.com/a/76646986
 # Posted by pradyunsg
@@ -62,21 +63,25 @@ class Config:
         """
 
         if DATA: # exit if data is already loaded
-            return
+            return DATA
 
         # check for important config presence
         for location in important_config:
             config_walker = config_file
+            config_example_walker = config_example_file
 
-            for directory in location[0]:
+            for directory in location:
                 try:
                     config_walker = config_walker[directory]
+                    config_example_walker = config_example_walker[directory]
                 except (KeyError, TypeError):
                     raise KeyError(f"Tried to look for a missing important config variable '{directory}' in {config_file}.")
 
                 # raise logging error if the important config couldn't be found
                 # or if it's equivalent to the default in config example
-                if not config_walker or config_walker == location[1]:
+                if not config_walker or config_walker == config_example_walker:
                     logging.error(message('errors', 'missing_config', variable_name=directory))
 
         return config_file
+
+DATA = Config().load()
