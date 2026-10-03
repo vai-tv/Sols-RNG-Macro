@@ -44,7 +44,7 @@ class Listener:
         else:
             raise TypeError(f"Listener needs either key or mouse argument specified.")
 
-        self.listener = keyboard.Listener() if self.type == "key" else mouse.Listener()
+        self.listener = keyboard.Listener(on_press=self.handle) if self.type == "key" else mouse.Listener(on_click=self.handle)
 
     @property
     def exit_requested(self) -> bool:
@@ -65,11 +65,8 @@ class Listener:
         """Starts the listener and sets status."""
 
         try:
-            if self.type == "key":
-                # start key listener
-                self.listener = keyboard.Listener()
-            else:
-                pass
+            logging.info("Starting listeners...")
+            self.listener.run()
 
         except Exception as e:
             raise e
@@ -91,6 +88,7 @@ class ListenerHandler:
 
     def __init__(self):
         self.listeners = self.load_listeners()
+        self.start()
 
     def start(self) -> None:
         """
@@ -134,6 +132,7 @@ class ListenerHandler:
             module = importlib.import_module(full_module_path)
             
             if not hasattr(module, "__all__"):
+                logging.warning(f"Couldn't load listener {listeners_dir} since it has no __all__.")
                 continue
 
             for class_name in module.__all__:
