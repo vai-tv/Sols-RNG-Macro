@@ -6,9 +6,6 @@
 * manages everything in `\\listeners` with `self.listeners` list
 """
 
-import importlib
-import os
-
 from pathlib import Path
 
 from pynput import keyboard, mouse
@@ -16,8 +13,8 @@ from pynput.keyboard import Key, KeyCode
 
 from typing import Literal
 
-
-from main import logging
+from common.HelperFunctions import load_exported_instances
+from utils.logger import logging
 
 
 class Listener:
@@ -84,7 +81,7 @@ class Listener:
 
 class ListenerHandler:
 
-    LISTENERS_DIR = os.path.join(os.path.dirname(__file__), "listeners")
+    LISTENERS_DIR = Path(__file__).resolve().parent.parent / "listeners"
 
     def __init__(self):
         self.listeners = self.load_listeners()
@@ -118,29 +115,8 @@ class ListenerHandler:
         Returns
         list["Listener"]: All listeners as a list.
         """
-
-        loaded_listeners = []
-        listeners_dir = Path(__file__).resolve().parent / "listeners"
-
-        for file_path in listeners_dir.glob("*.py"):
-            if file_path.name == "__init__.py":
-                continue
-
-            module_name = file_path.stem
-            full_module_path = f"roblox.listeners.{module_name}"
-            
-            module = importlib.import_module(full_module_path)
-            
-            if not hasattr(module, "__all__"):
-                logging.warning(f"Couldn't load listener {listeners_dir} since it has no __all__.")
-                continue
-
-            for class_name in module.__all__:
-                listener_class = getattr(module, class_name)
-
-                instance = listener_class()
-                
-                loaded_listeners.append(instance)
-                logging.info(f"Listener added! {file_path}")
-
-        return loaded_listeners
+        return load_exported_instances(
+            ListenerHandler.LISTENERS_DIR,
+            "roblox.listeners",
+            Listener,
+        )
