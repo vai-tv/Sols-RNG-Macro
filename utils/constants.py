@@ -7,6 +7,6 @@ very unimportant to you but integral to the build (probably)! please leave them 
 class Git:
     AUTHOR = "vai-tv" # @cherryrntz on discord
     REPO = "Sols-RNG-Macro"
-    VERSION = "v0.1.1"
+    VERSION = "v0.1.2"
     URL = f"https://api.github.com/repos/{AUTHOR}/{REPO}/releases/latest"
     PRERELEASE_URL = f"https://api.github.com/repos/{AUTHOR}/{REPO}/releases"
