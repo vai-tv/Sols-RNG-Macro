@@ -14,7 +14,7 @@ from pynput.keyboard import Key, KeyCode
 from typing import Literal
 
 from common.HelperFunctions import load_exported_instances
-from utils.logger import logging
+from macro.utils.logger import logging
 
 
 class Listener:

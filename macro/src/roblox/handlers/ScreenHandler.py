@@ -14,7 +14,7 @@ from PIL import Image
 
 from common.HelperFunctions import load_exported_instances
 from common.MessageHandler import message
-from utils.logger import logging
+from macro.utils.logger import logging
 
 import pygetwindow as gw  # type: ignore[import-untyped]
 

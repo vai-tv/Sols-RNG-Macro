@@ -4,7 +4,7 @@ from importlib import import_module
 from pathlib import Path
 from typing import TypeVar, cast
 
-from utils.logger import logging
+from macro.utils.logger import logging
 
 
 T = TypeVar("T")

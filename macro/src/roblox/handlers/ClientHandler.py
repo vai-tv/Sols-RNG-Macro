@@ -18,7 +18,7 @@ import webbrowser
 from typing import Literal, Protocol, TypedDict
 
 from common.config import Config
-from utils.logger import logging
+from macro.utils.logger import logging
 
 from roblox.handlers.ListenerHandler import ListenerHandler as ListenerHdlr
 from roblox.handlers.OverlayHandler import OverlayHandler as OverlayHdlr

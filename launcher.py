@@ -15,8 +15,8 @@ import sys
 import requests
 import zipfile
 
-from utils.constants import Git
-from utils.logger import setup_logger
+from macro.utils.constants import Git
+from macro.utils.logger import setup_logger
 
 from macro.src.common.config import Config
 
