@@ -5,7 +5,6 @@ import math
 import random
 
 # basic is 1-999, epic is 1000-9999 etc
-# reverse the rank order so higher tiers are evaluated before lower tiers
 RANK_BOUNDARIES = {
     "basic"         : 999,
     "epic"          : 9999,
@@ -51,7 +50,8 @@ class Aura:
                     break
 
         self.biome_amplifiers: dict[str, int] = {k.lower() : v for k, v in properties["biome_amplifiers"].items()}
-        self.biome_whitelist = properties.get("biome_whitelist", [])
+        self.biome_whitelist = [biome.lower() for biome in properties.get("biome_whitelist", [])]
+        self.biome_blacklist = [biome.lower() for biome in properties.get("biome_blacklist", [])]
 
     def __str__(self) -> str:
         return f"{self.name} [1 in {self.base_chance}]"
@@ -64,22 +64,44 @@ BIOMES = {'graveyard', 'dreamspace', 'hell', 'null', 'heaven',
           'day', 'singularity', 'snowy', 'blood rain', 'none'}
 RARE_BIOMES = {'graveyard', 'dreamspace', 'glitched', 'pumpkin moon', 'blazing sun',
                'singularity', 'blood rain'}
+RUNE_BIOMES = {'hell', 'null', 'heaven', 'corruption', 'sand storm',
+               'snowy', 'rainy', 'starfall'}
 
-def _prepare_auras(biome: str) -> list[Aura]:
+def _get_biome_amplifier(aura: Aura, biome: str, ROE: bool) -> int:
+    if ROE:
+        return max(
+            (amplifier for name, amplifier in aura.biome_amplifiers.items()
+             if name in RUNE_BIOMES),
+            default=1
+        )
+    return aura.biome_amplifiers.get(biome, 1)
+
+def _prepare_auras(biome: str, ROE: bool) -> list[Aura]:
     auras_copy = auras.copy()
 
     # sort by luck
-    auras_copy.sort(key=lambda a: 
-               a.base_chance * a.biome_amplifiers.get(biome, 1),
-               reverse=True)
+    auras_copy.sort(
+        key=lambda a:
+        # include biome multiplier
+        a.base_chance / _get_biome_amplifier(a, biome, ROE),
+        reverse=True
+    )
 
-    return [a for a in auras_copy if not (a.biome_whitelist and biome not in a.biome_whitelist)]
+    # remove auras that do not pass the biome whitelist or blacklist
+    return [
+        aura for aura in auras_copy
+        if (
+            not aura.biome_whitelist
+            or biome in aura.biome_whitelist
+        )
+        and (biome not in aura.biome_blacklist)
+    ]
 
-def _get_rarity(aura: Aura, luck: float, biome: str) -> int:
-    rarity = aura.base_chance * aura.biome_amplifiers.get(biome, 1)
+def _get_rarity(aura: Aura, luck: float, biome: str, ROE: bool) -> int:
+    rarity = aura.base_chance / _get_biome_amplifier(aura, biome, ROE)
     return math.ceil(rarity / luck)
 
-def simulate_roll(auras: list[Aura], luck: float, biome: str) -> Aura:
+def simulate_roll(auras: list[Aura], luck: float, biome: str, ROE: bool) -> Aura:
     """
     Simulates a roll according to the Sols RNG algorithm.
 
@@ -88,12 +110,12 @@ def simulate_roll(auras: list[Aura], luck: float, biome: str) -> Aura:
 
     for aura in auras:
 
-        if random.randint(1, _get_rarity(aura, luck, biome)) == 1:
+        if random.randint(1, _get_rarity(aura, luck, biome, ROE)) == 1:
             return aura
 
     return auras[-1]
 
-def get_rank_odds(auras: list[Aura], luck: float, biome: str) -> dict[str, float]:
+def get_rank_odds(auras: list[Aura], luck: float, biome: str, ROE: bool) -> dict[str, float]:
     """
     Determines the probability of rolling each rank in the supplied aura order.
     """
@@ -116,7 +138,7 @@ def get_rank_odds(auras: list[Aura], luck: float, biome: str) -> dict[str, float
                 # simulate_roll returns the final aura if all checks fail.
                 aura_failure_probability = 0.0
             else:
-                aura_probability = 1 / _get_rarity(auras[index], luck, biome)
+                aura_probability = 1 / _get_rarity(auras[index], luck, biome, ROE)
                 aura_failure_probability = 1 - aura_probability
 
             rank_failure_probability *= aura_failure_probability
@@ -129,16 +151,17 @@ def get_rank_odds(auras: list[Aura], luck: float, biome: str) -> dict[str, float
 
 def main():
 
-    luck = float(input("Enter your luck : "))
+    luck = float(input("Enter your luck :  "))
+    ROE = input("Rune of Everything? (y/n) ").lower() == 'y'
 
     while (biome := input("Enter your biome : ").lower()) not in BIOMES:
         print(f"'{biome}' is not a biome. Choose from : {", ".join(BIOMES)}.")
 
-    prepared_auras = _prepare_auras(biome)
+    prepared_auras = _prepare_auras(biome, ROE)
 
-    print("Rank odds:")
-    for rank, probability in get_rank_odds(prepared_auras, luck, biome).items():
-        print(f"{rank}: {probability:.8%}")
+    rank_odds = get_rank_odds(prepared_auras, luck, biome, ROE)
+    for rank, probability in sorted(rank_odds.items(), key=lambda x: x[1], reverse=True):
+        print(f"{rank.capitalize().ljust(20)} {probability:.8%} (every {round(1 / probability, 1) if probability != 0 else 'NaN'} rolls)")
 
 if __name__ == '__main__':
     main()
