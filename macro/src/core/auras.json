@@ -4,6 +4,9 @@
         "properties": {
             "name": "Nothing",
             "base_chance": 1,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -1138,6 +1141,9 @@
         "properties": {
             "name": "Raven",
             "base_chance": 500000,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -1418,6 +1424,9 @@
         "properties": {
             "name": "ゴシック",
             "base_chance": 3000000,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -1628,6 +1637,9 @@
         "properties": {
             "name": "Anima",
             "base_chance": 5730000,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -2034,6 +2046,9 @@
         "properties": {
             "name": "Imaginary",
             "base_chance": 12200200,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -2272,6 +2287,9 @@
         "properties": {
             "name": "Juxtaposition",
             "base_chance": 40440400,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -2734,6 +2752,9 @@
         "properties": {
             "name": "Raven : Plague",
             "base_chance": 20000000,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -3087,6 +3108,9 @@
         "properties": {
             "name": "Unknown",
             "base_chance": 444444444,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -3171,6 +3195,9 @@
         "properties": {
             "name": "Elude",
             "base_chance": 555555555,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -3227,6 +3254,9 @@
         "properties": {
             "name": "Prologue",
             "base_chance": 666616111,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -3328,6 +3358,9 @@
         "properties": {
             "name": "Dreamscape",
             "base_chance": 850000000,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1
@@ -3370,6 +3403,9 @@
         "properties": {
             "name": "Nyctophobia",
             "base_chance": 1011111010,
+            "biome_whitelist" : [
+                "LIMBO"
+            ],
             "biome_amplifier": [
                 "None",
                 1

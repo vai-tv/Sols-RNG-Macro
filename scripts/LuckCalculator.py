@@ -61,7 +61,8 @@ auras = [Aura(aura) for aura in auras_dict]
 BIOMES = {'graveyard', 'dreamspace', 'hell', 'null', 'heaven', 
           'corruption', 'night', 'glitched', 'sand storm', 'windy', 
           'rainy', 'starfall', 'pumpkin moon', 'blazing sun', 'cyberspace', 
-          'day', 'singularity', 'snowy', 'blood rain', 'none'}
+          'day', 'singularity', 'snowy', 'blood rain', 'limbo', 
+          'none'}
 RARE_BIOMES = {'graveyard', 'dreamspace', 'glitched', 'pumpkin moon', 'blazing sun',
                'singularity', 'blood rain'}
 RUNE_BIOMES = {'hell', 'null', 'heaven', 'corruption', 'sand storm',
@@ -87,7 +88,7 @@ def _prepare_auras(biome: str, ROE: bool) -> list[Aura]:
         reverse=True
     )
 
-    # remove auras that do not pass the biome whitelist or blacklist
+    # remove auras that do not pass the biome whitelist or blacklist (if biome is limbo then ignore all non-limbo auras)
     return [
         aura for aura in auras_copy
         if (
@@ -95,6 +96,7 @@ def _prepare_auras(biome: str, ROE: bool) -> list[Aura]:
             or biome in aura.biome_whitelist
         )
         and (biome not in aura.biome_blacklist)
+        and (biome != "limbo" or (biome == "limbo" and "limbo" in aura.biome_whitelist))
     ]
 
 def _get_rarity(aura: Aura, luck: float, biome: str, ROE: bool) -> int:
