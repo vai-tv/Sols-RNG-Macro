@@ -171,8 +171,13 @@ def main():
         for _ in range(number_of_rolls)
     ]
 
-    for rolled_aura in sorted(rolled_auras, key=lambda aura: aura.base_chance, reverse=True):
-        print(f"You rolled {rolled_aura.name}! [1 in {rolled_aura.base_chance:,}]")
+    aura_counts = {}
+    for rolled_aura in rolled_auras:
+        aura_counts[rolled_aura] = aura_counts.get(rolled_aura, 0) + 1
+
+    for rolled_aura, count in sorted(aura_counts.items(), key=lambda item: item[0].base_chance, reverse=True):
+        count_suffix = f" (x{count})" if count > 1 else ""
+        print(f"You rolled {rolled_aura.name}{count_suffix}! [1 in {rolled_aura.base_chance:,}]")
 
 if __name__ == '__main__':
     main()
