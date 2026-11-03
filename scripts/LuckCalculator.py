@@ -170,7 +170,7 @@ def main():
     ]
 
     for rolled_aura in sorted(rolled_auras, key=lambda aura: aura.base_chance, reverse=True):
-        print(f"You rolled {rolled_aura.name}! [1 in {rolled_aura.base_chance}]")
+        print(f"You rolled {rolled_aura.name}! [1 in {rolled_aura.base_chance:,}]")
 
 if __name__ == '__main__':
     main()
