@@ -163,10 +163,14 @@ def main():
     for rank, probability in sorted(rank_odds.items(), key=lambda x: x[1], reverse=True):
         print(f"{rank.capitalize().ljust(20)} {probability:.8%} (every {round(1 / probability, 1) if probability != 0 else 'NaN'} rolls)")
 
-    print("Press enter to simulate a roll")
-    while input() == "":
-        rolled_aura = simulate_roll(prepared_auras, luck, biome, ROE)
-        print(f"You rolled {rolled_aura.name}! [1 in {rolled_aura.base_chance}]", end='')
+    number_of_rolls = int(input("Enter the number of rolls to simulate: "))
+    rolled_auras = [
+        simulate_roll(prepared_auras, luck, biome, ROE)
+        for _ in range(number_of_rolls)
+    ]
+
+    for rolled_aura in sorted(rolled_auras, key=lambda aura: aura.base_chance, reverse=True):
+        print(f"You rolled {rolled_aura.name}! [1 in {rolled_aura.base_chance}]")
 
 if __name__ == '__main__':
     main()
