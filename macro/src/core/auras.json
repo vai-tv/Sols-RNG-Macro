@@ -3448,7 +3448,6 @@
         "properties": {
             "name": "Leviathan",
             "base_chance": 1730400000,
-            "fixed_rarity": true,
             "biome_whitelist": [
                 "RAINY",
                 "GLITCHED"
