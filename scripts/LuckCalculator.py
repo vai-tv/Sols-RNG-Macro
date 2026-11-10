@@ -40,6 +40,7 @@ class Aura:
         self.name: str = properties["name"]
         self.base_chance: int = properties["base_chance"]
         self.unobtainable: bool = properties.get("unobtainable", False)
+        self.fixed_rarity: bool = properties.get("fixed_rarity", False)
 
         if properties.get("rank") is not None:
             self.rank = properties["rank"]
@@ -100,6 +101,8 @@ def _prepare_auras(biome: str, ROE: bool) -> list[Aura]:
     ]
 
 def _get_rarity(aura: Aura, luck: float, biome: str, ROE: bool) -> int:
+    if aura.fixed_rarity: # if the aura has a fixed rarity, we ignore luck
+        luck = 1
     rarity = aura.base_chance / _get_biome_amplifier(aura, biome, ROE)
     return math.ceil(rarity / luck)
 
