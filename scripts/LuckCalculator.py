@@ -81,11 +81,13 @@ def _get_biome_amplifier(aura: Aura, biome: str, ROE: bool) -> int:
 def _prepare_auras(biome: str, ROE: bool) -> list[Aura]:
     auras_copy = auras.copy()
 
-    # sort by luck
+    # sort by fixed rarity then luck
     auras_copy.sort(
-        key=lambda a:
+        key=lambda a: (
+            a.fixed_rarity,
         # include biome multiplier
-        a.base_chance / _get_biome_amplifier(a, biome, ROE),
+            a.base_chance / _get_biome_amplifier(a, biome, ROE),
+        ),
         reverse=True
     )
 
